@@ -48,3 +48,21 @@ export const googleCallback = tryCatch(async (user, req, res, next) => {
         res.redirect(`${frontendUrl}backend_redirect?token=${token}`);
     }
 });
+
+export const allUsers = tryCatch(async (req, res, next) => {
+    if (req.user.role !== "admin") {
+        return next(new ErrorHandler("You do not have permission to access all users", 403))
+    }
+    const users = await User.find();
+    res.status(200).json(users);
+})
+
+export const updateUser = tryCatch(async (req, res, next) => {
+    if (req.user.role !== "admin") {
+        return next(new ErrorHandler("You do not have permission to update users", 403))
+    }
+    const { id } = req.params;
+    const role = req.body.role;
+    await User.findByIdAndUpdate(id, { role });
+    res.status(200).json({ message: "User role updated successfully" });
+})
