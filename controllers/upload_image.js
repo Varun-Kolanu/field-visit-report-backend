@@ -1,11 +1,10 @@
 import { tryCatch } from "../utils/utils.js";
 import admin from "firebase-admin";
-import serviceAccount from "../config/field-visit-report-file-uploads.json" assert {type: "json"}
 import ErrorHandler from "../middlewares/error.js";
 import path from "path";
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert(JSON.parse(process.env.SERVICE_ACCOUNT_KEY)),
     storageBucket: process.env.STORAGE_BUCKET,
 });
 
