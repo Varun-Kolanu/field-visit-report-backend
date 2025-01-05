@@ -5,17 +5,21 @@ import { frontendUrl } from "../config/constants.js";
 import passport from "passport";
 
 const isAuthenticated = async (req, _, next) => {
-    let token = req.headers.authorization;
+    try {
+        let token = req.headers.authorization;
 
-    if (!token || !token.startsWith('Bearer ')) {
-        return next(new ErrorHandler("Please Login first", 400))
+        if (!token || !token.startsWith('Bearer ')) {
+            return next(new ErrorHandler("Please Login first", 400))
+        }
+
+        token = token.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        req.user = await User.findById(decoded._id);
+        next();
+    } catch (error) {
+        next(error)
     }
-
-    token = token.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    req.user = await User.findById(decoded._id);
-    next();
 }
 
 export const cbMiddleware = (req, res, next) => {
